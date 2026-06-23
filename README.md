@@ -28,13 +28,38 @@ ULog topic and field schema.
 
 ## Install
 
+Create a virtual environment:
+
 ```bash
-source venv/bin/activate
-pip install -r requirements.txt
+python -m venv venv
 ```
 
-You can also run every command without shell activation by using
-`venv/bin/python`, as shown below.
+Activate it using the command for your shell:
+
+```bash
+# macOS/Linux
+source venv/bin/activate
+```
+
+```powershell
+# Windows PowerShell
+.\venv\Scripts\Activate.ps1
+```
+
+```bat
+:: Windows Command Prompt
+venv\Scripts\activate.bat
+```
+
+After activation, use `python` for the commands below. You can also run without
+activation by replacing `python` with `venv/bin/python` on macOS/Linux or
+`.\venv\Scripts\python.exe` on Windows.
+
+Install dependencies:
+
+```bash
+python -m pip install -r requirements.txt
+```
 
 ## Dataset Layout
 
@@ -67,11 +92,11 @@ relative path stem as the flight ID.
 ## Run Commands
 
 ```bash
-venv/bin/python scripts/task1_frame_classification.py --data . --out outputs
-venv/bin/python scripts/task2_payload_classification.py --data . --out outputs
-venv/bin/python scripts/task3_mass_regression.py --data . --out outputs
-venv/bin/python scripts/task4_navigation_odometry.py --data . --out outputs
-venv/bin/python scripts/task5_event_detection.py --data . --out outputs
+python scripts/task1_frame_classification.py --data . --out outputs
+python scripts/task2_payload_classification.py --data . --out outputs
+python scripts/task3_mass_regression.py --data . --out outputs
+python scripts/task4_navigation_odometry.py --data . --out outputs
+python scripts/task5_event_detection.py --data . --out outputs
 ```
 
 Every script supports:
@@ -111,7 +136,8 @@ All outputs are written under `outputs/` by default:
 
 Tasks 3-5 extend the original classification baselines into regression,
 navigation, and temporal event detection. All results below were regenerated
-from the checked-in scripts with `venv/bin/python ... --data . --out outputs`.
+from the checked-in scripts with `python ... --data . --out outputs` after
+activating the virtual environment.
 
 ### Task 3: Payload-Mass Regression
 
@@ -226,7 +252,7 @@ Subsequent loads reuse parquet files if they are newer than the source ULog.
 Use `--no-cache` to force a fresh parse. Clear cached parquet files with:
 
 ```bash
-venv/bin/python -m dronelog.clear_cache
+python -m dronelog.clear_cache
 ```
 
 `pyarrow` is included in `requirements.txt` for parquet support. If parquet
