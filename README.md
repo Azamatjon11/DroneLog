@@ -167,15 +167,17 @@ Figures:
 
 The navigation benchmark integrates IMU acceleration to estimate position and
 scores it against independently projected GPS truth. PX4 EKF local position is
-scored as a strong baseline, not as ground truth. Raw GPS altitude is scaled
-from millimeters when needed; a spot-check on `d250_1` gave raw GPS altitude
-median `27396` and projected GPS vertical range `-2.98..5.07 m`, with EKF
-vertical RMS `0.53 m` and horizontal RMS `0.66 m`.
+scored as a strong baseline, not as ground truth. The table reports both
+per-flight median and mean values to match the paper's Table 8 and avoid
+confusing the mean with the median. Raw GPS altitude is scaled from millimeters
+when needed; a spot-check on `d250_1` gave raw GPS altitude median `27396` and
+projected GPS vertical range `-2.98..5.07 m`, with EKF vertical RMS `0.53 m`
+and horizontal RMS `0.66 m`.
 
-| Method | Truth | ATE-RMSE (m) | Final Drift (%) |
-|---|---|---:|---:|
-| IMU-only strapdown | vehicle_gps_position | 276.915 | 496.697 |
-| PX4 EKF local_position | vehicle_gps_position | 1.233 | 1.537 |
+| Method | Truth | ATE-RMSE median (m) | ATE-RMSE mean (m) | Final Drift median (%) | Final Drift mean (%) |
+|---|---|---:|---:|---:|---:|
+| IMU-only strapdown | vehicle_gps_position | 161.439 | 276.915 | 371.901 | 496.697 |
+| PX4 EKF local_position | vehicle_gps_position | 0.225 | 1.233 | 0.262 | 1.537 |
 
 Figure:
 
