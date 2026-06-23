@@ -271,6 +271,6 @@ truth; EKF local position is scored as a method.
 
 ## Webpage
 
-A static devkit webpage is available at `site/index.html`. It summarizes the
+A static devkit webpage is available at `https://azamatjon11.github.io/DroneLog/`. It summarizes the
 five benchmark tasks, links the runnable commands, and embeds the generated
 Task 3-5 figures.
