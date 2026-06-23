@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DroneLog — UAV Flight Telemetry Dataset</title>
+<style>
+  :root {
+    --bg: #0e1116;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #c9d1d9;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+  }
+  header {
+    padding: 64px 24px 40px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+  }
+  header h1 {
+    font-size: 2.4rem;
+    margin: 0 0 12px;
+    color: #fff;
+  }
+  header p.tagline {
+    color: var(--muted);
+    font-size: 1.1rem;
+    max-width: 640px;
+    margin: 0 auto 24px;
+  }
+  .badges a {
+    display: inline-block;
+    margin: 4px 6px;
+    padding: 8px 16px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 0.9rem;
+  }
+  .badges a:hover { border-color: var(--accent); }
+
+  main {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 48px 24px;
+  }
+  section { margin-bottom: 56px; }
+  h2 {
+    font-size: 1.5rem;
+    color: #fff;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+    margin-bottom: 20px;
+  }
+  ul { padding-left: 20px; }
+  li { margin-bottom: 6px; }
+  code {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 0.9em;
+  }
+  pre {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    overflow-x: auto;
+    font-size: 0.85rem;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    font-size: 0.9rem;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    text-align: left;
+  }
+  th { background: var(--panel); color: #fff; }
+  .task-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+  .task-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .task-card h3 {
+    margin: 0 0 8px;
+    font-size: 1rem;
+    color: var(--accent);
+  }
+  .task-card p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  figure { margin: 24px 0; text-align: center; }
+  figure img {
+    max-width: 100%;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  figcaption {
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-top: 8px;
+  }
+  footer {
+    text-align: center;
+    padding: 32px 24px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+    font-size: 0.85rem;
+  }
+  footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>DroneLog</h1>
+  <p class="tagline">
+    A real-world, multi-platform UAV flight telemetry dataset for airframe
+    identification and payload state recognition — with benchmarks for
+    classification, regression, navigation, and event detection.
+  </p>
+  <div class="badges">
+    <a href="https://doi.org/10.5281/zenodo.20279005">📦 Dataset (Zenodo)</a>
+    <a href="https://github.com/Azamatjon11/DroneLog">💻 Devkit (GitHub)</a>
+    <a href="#citation">📄 Paper</a>
+  </div>
+</header>
+
+<main>
+
+  <section>
+    <h2>Overview</h2>
+    <p>
+      DroneLog is collected from <strong>five real quadrotor platforms</strong>
+      spanning five frame sizes (250&nbsp;mm–680&nbsp;mm) and two payload-capable
+      platforms (Holybro X500&nbsp;V2 and X650) flown outdoors under naturalistic,
+      unscripted conditions. All data is released as native PX4 ULog flight logs,
+      requiring no external cameras, motion capture, or additional sensing hardware.
+    </p>
+    <ul>
+      <li>5 quadrotor platforms across 5 frame sizes (250 / 450 / 500 / 650 / 680&nbsp;mm)</li>
+      <li>5 payload behavioral scenarios across multiple weight configurations (0.5–2&nbsp;kg)</li>
+      <li>Full PX4 telemetry per flight: IMU, GPS, attitude, local position, battery, actuator outputs</li>
+      <li>Ground-truth event timestamps for payload pickup and drop</li>
+      <li>Released in both native ULog and pre-extracted CSV formats</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Benchmark Tasks</h2>
+    <p>The devkit ships five runnable baseline tasks covering four distinct problem types:</p>
+    <div class="task-grid">
+      <div class="task-card">
+        <h3>1 · Frame-Size Classification</h3>
+        <p>Identify airframe size class from windowed IMU statistics.</p>
+      </div>
+      <div class="task-card">
+        <h3>2 · Payload-Scenario Classification</h3>
+        <p>Classify behavioral scenario (no payload, pickup, drop, etc.).</p>
+      </div>
+      <div class="task-card">
+        <h3>3 · Payload-Mass Regression</h3>
+        <p>Estimate carried payload mass as a continuous value.</p>
+      </div>
+      <div class="task-card">
+        <h3>4 · Navigation / Odometry</h3>
+        <p>IMU-only strapdown integration scored against GPS and EKF tracks.</p>
+      </div>
+      <div class="task-card">
+        <h3>5 · Pickup/Drop Event Detection</h3>
+        <p>Detect the exact moment of payload state transitions.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Dataset Layout</h2>
+    <pre>dataset_root/
+  frame_size/
+    250mm/ d250_1.ulg ...
+    450mm/ d450_1.ulg ...
+    500mm/ d500_1.ulg ...
+    650mm/ d650_1.ulg ...
+    680mm/ d680_1.ulg ...
+  payload_detection/
+    x500v2/
+      0.5kg/ 1_scenario.ulg ...
+      0.75kg/ 1_scenario.ulg ...
+      1kg/ 1_scenario.ulg ...
+    x650/
+      0.5kg/ 1_scenario.ulg ...
+      1kg/ 1_scenario.ulg ...
+      1.5kg/ 1_scenario.ulg ...
+      2kg/ 1_scenario.ulg ...</pre>
+  </section>
+
+  <section>
+    <h2>Getting Started</h2>
+    <p>Install the devkit and run any baseline directly from the command line:</p>
+    <pre>source venv/bin/activate
+pip install -r requirements.txt
+
+python scripts/task1_frame_classification.py --data . --out outputs
+python scripts/task4_navigation_odometry.py --data . --out outputs</pre>
+    <p>
+      Every script supports <code>--inspect</code> to preview topics and matched
+      fields before running a full benchmark. See the
+      <a href="https://github.com/Azamatjon11/DroneLog">repository README</a>
+      for full usage details.
+    </p>
+  </section>
+
+  <section>
+    <h2>Selected Results</h2>
+    <figure>
+      <img src="assets/figures/task4_trajectory.png" alt="Task 4 trajectory plot">
+      <figcaption>Task 4 — IMU-only strapdown trajectory vs. PX4 EKF and GPS-derived ground truth.</figcaption>
+    </figure>
+    <figure>
+      <img src="assets/figures/task5_events.png" alt="Task 5 event detection plot">
+      <figcaption>Task 5 — Detected payload pickup/drop events against annotated ground truth.</figcaption>
+    </figure>
+    <p>
+      Full results tables for all five tasks are available in the
+      <a href="https://github.com/Azamatjon11/DroneLog#extended-benchmark-tasks">repository README</a>.
+    </p>
+  </section>
+
+  <section id="citation">
+    <h2>Citation</h2>
+    <pre>@article{dronelog2026,
+  title   = {DroneLog: A Flight Telemetry Benchmark Dataset for UAV
+             Airframe Identification and Payload State Recognition},
+  author  = {[Author names]},
+  journal = {The International Journal of Robotics Research},
+  year    = {2026}
+}</pre>
+  </section>
+
+</main>
+
+<footer>
+  Dataset hosted on <a href="https://doi.org/10.5281/zenodo.20279005">Zenodo</a> ·
+  Devkit on <a href="https://github.com/Azamatjon11/DroneLog">GitHub</a> ·
+  Released under CC BY 4.0
+</footer>
+
+</body>
+</html>
