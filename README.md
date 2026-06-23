@@ -28,11 +28,14 @@ ULog topic and field schema.
 
 ## Install
 
-Create a virtual environment:
+Use Python 3.10 or newer. Create a virtual environment first:
 
 ```bash
 python -m venv venv
 ```
+
+If your system uses `python3` for Python 3, replace `python` with `python3` in
+the setup commands.
 
 Activate it using the command for your shell:
 
