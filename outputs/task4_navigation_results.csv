@@ -1,0 +1,101 @@
+flight_id,method,truth_source,ate_rmse_m,final_drift_percent,samples
+frame_size/250mm/d250_1,IMU-only strapdown,vehicle_gps_position,108.68683845063093,237.0337772578221,363
+frame_size/250mm/d250_1,PX4 EKF local_position,vehicle_gps_position,0.8435480922246588,1.4215319966440034,363
+frame_size/250mm/d250_2,IMU-only strapdown,vehicle_gps_position,54.03130207622742,120.71113396425379,346
+frame_size/250mm/d250_2,PX4 EKF local_position,vehicle_gps_position,1.1323369398951455,0.9874481335199522,345
+frame_size/250mm/d250_3,IMU-only strapdown,vehicle_gps_position,21.27362296405379,40.678409479181965,301
+frame_size/250mm/d250_3,PX4 EKF local_position,vehicle_gps_position,2.0971352821017906,1.4387958104518082,301
+frame_size/450mm/d450_1,IMU-only strapdown,vehicle_gps_position,39.39034007201856,54.667073634511894,507
+frame_size/450mm/d450_1,PX4 EKF local_position,vehicle_gps_position,19.802932912646696,19.65967944938648,507
+frame_size/450mm/d450_2,IMU-only strapdown,vehicle_gps_position,30.949287770762258,97.90251016769093,371
+frame_size/450mm/d450_2,PX4 EKF local_position,vehicle_gps_position,2.7112450039171416,6.001446398355986,370
+frame_size/450mm/d450_3,IMU-only strapdown,vehicle_gps_position,19.198596492454538,52.316182797626084,403
+frame_size/450mm/d450_3,PX4 EKF local_position,vehicle_gps_position,6.0003399471201915,6.576608004572971,403
+frame_size/500mm/d500_1,IMU-only strapdown,vehicle_gps_position,319.37317115740495,588.0172734468739,1616
+frame_size/500mm/d500_1,PX4 EKF local_position,vehicle_gps_position,0.2797010550841827,0.27891721850866813,1616
+frame_size/500mm/d500_2,IMU-only strapdown,vehicle_gps_position,61.80856150172926,116.34036792831475,1022
+frame_size/500mm/d500_2,PX4 EKF local_position,vehicle_gps_position,0.19972233175052215,0.06619989293748368,1021
+frame_size/500mm/d500_3,IMU-only strapdown,vehicle_gps_position,39.05471065946349,71.31574596982655,1037
+frame_size/500mm/d500_3,PX4 EKF local_position,vehicle_gps_position,0.17382821041302032,0.15211412519025022,1037
+frame_size/650mm/d650_1,IMU-only strapdown,vehicle_gps_position,56.73566540763187,134.43941964898107,984
+frame_size/650mm/d650_1,PX4 EKF local_position,vehicle_gps_position,0.3413368680517416,0.21227315926210719,984
+frame_size/650mm/d650_2,IMU-only strapdown,vehicle_gps_position,66.96864898789899,145.74326571817397,949
+frame_size/650mm/d650_2,PX4 EKF local_position,vehicle_gps_position,0.16358465909910308,0.1922518138281977,949
+frame_size/650mm/d650_3,IMU-only strapdown,vehicle_gps_position,46.72774101085087,107.6133900905029,802
+frame_size/650mm/d650_3,PX4 EKF local_position,vehicle_gps_position,0.19723880390728013,0.3041836377486826,802
+frame_size/680mm/d680_1,IMU-only strapdown,vehicle_gps_position,761.7738641968289,1414.0016484285447,1062
+frame_size/680mm/d680_1,PX4 EKF local_position,vehicle_gps_position,3.386493370601119,5.643592834832044,1062
+frame_size/680mm/d680_2,IMU-only strapdown,vehicle_gps_position,171.03688841788298,383.6114292154644,615
+frame_size/680mm/d680_2,PX4 EKF local_position,vehicle_gps_position,11.106866968661526,16.59447130776768,615
+frame_size/680mm/d680_3,IMU-only strapdown,vehicle_gps_position,139.59020419208133,430.3995830991762,564
+frame_size/680mm/d680_3,PX4 EKF local_position,vehicle_gps_position,3.1898615162370825,6.673069661701858,564
+payload_detection/x500v2/0.5kg/1_scenario,IMU-only strapdown,vehicle_gps_position,319.37317115740495,588.0172734468739,1616
+payload_detection/x500v2/0.5kg/1_scenario,PX4 EKF local_position,vehicle_gps_position,0.2797010550841827,0.27891721850866813,1616
+payload_detection/x500v2/0.5kg/2_scenario,IMU-only strapdown,vehicle_gps_position,614.6394122552034,1436.131336540526,1718
+payload_detection/x500v2/0.5kg/2_scenario,PX4 EKF local_position,vehicle_gps_position,0.24364238147778194,0.39948953894169414,1717
+payload_detection/x500v2/0.5kg/3_scenario,IMU-only strapdown,vehicle_gps_position,764.2423173901803,1002.3505952460455,1650
+payload_detection/x500v2/0.5kg/3_scenario,PX4 EKF local_position,vehicle_gps_position,0.3634766976011944,0.23769720409804965,1649
+payload_detection/x500v2/0.5kg/4_scenario,IMU-only strapdown,vehicle_gps_position,1070.6810309574223,1004.9306085400771,2177
+payload_detection/x500v2/0.5kg/4_scenario,PX4 EKF local_position,vehicle_gps_position,0.3122631638013909,0.22261738625052294,2176
+payload_detection/x500v2/0.5kg/5_scenario,IMU-only strapdown,vehicle_gps_position,935.1103864735683,1136.9197697789316,1725
+payload_detection/x500v2/0.5kg/5_scenario,PX4 EKF local_position,vehicle_gps_position,0.29515658586619187,0.2415555061946435,1725
+payload_detection/x500v2/0.75kg/1_scenario,IMU-only strapdown,vehicle_gps_position,319.37317115740495,588.0172734468739,1616
+payload_detection/x500v2/0.75kg/1_scenario,PX4 EKF local_position,vehicle_gps_position,0.2797010550841827,0.27891721850866813,1616
+payload_detection/x500v2/0.75kg/2_scenario,IMU-only strapdown,vehicle_gps_position,443.6851289263823,1274.4455262289182,1267
+payload_detection/x500v2/0.75kg/2_scenario,PX4 EKF local_position,vehicle_gps_position,2.5080895313404747,0.7503513343297754,1266
+payload_detection/x500v2/0.75kg/3_scenario,IMU-only strapdown,vehicle_gps_position,537.8366420137679,1155.7421757062887,2109
+payload_detection/x500v2/0.75kg/3_scenario,PX4 EKF local_position,vehicle_gps_position,0.23106671534739626,0.618909459809356,2108
+payload_detection/x500v2/0.75kg/4_scenario,IMU-only strapdown,vehicle_gps_position,355.21470331768415,373.52620903451106,2458
+payload_detection/x500v2/0.75kg/4_scenario,PX4 EKF local_position,vehicle_gps_position,0.13998574748809303,0.014284461096891517,2458
+payload_detection/x500v2/0.75kg/5_scenario,IMU-only strapdown,vehicle_gps_position,55.10839032106606,104.47260873570946,1672
+payload_detection/x500v2/0.75kg/5_scenario,PX4 EKF local_position,vehicle_gps_position,0.13815472644046567,0.08798024892315626,1671
+payload_detection/x500v2/1kg/1_scenario,IMU-only strapdown,vehicle_gps_position,319.37317115740495,588.0172734468739,1616
+payload_detection/x500v2/1kg/1_scenario,PX4 EKF local_position,vehicle_gps_position,0.2797010550841827,0.27891721850866813,1616
+payload_detection/x500v2/1kg/2_scenario,IMU-only strapdown,vehicle_gps_position,16.834743150803263,107.66322841502412,863
+payload_detection/x500v2/1kg/2_scenario,PX4 EKF local_position,vehicle_gps_position,0.13081342950375358,0.47675560432371483,862
+payload_detection/x500v2/1kg/3_scenario,IMU-only strapdown,vehicle_gps_position,537.8366420137679,1155.7421757062887,2109
+payload_detection/x500v2/1kg/3_scenario,PX4 EKF local_position,vehicle_gps_position,0.23106671534739626,0.618909459809356,2108
+payload_detection/x500v2/1kg/4_scenario,IMU-only strapdown,vehicle_gps_position,527.1675389704566,975.2584612089927,2095
+payload_detection/x500v2/1kg/4_scenario,PX4 EKF local_position,vehicle_gps_position,0.20447889790301013,0.36871303502795993,2095
+payload_detection/x500v2/1kg/5_scenario,IMU-only strapdown,vehicle_gps_position,255.24324773930044,779.0405529864126,1365
+payload_detection/x500v2/1kg/5_scenario,PX4 EKF local_position,vehicle_gps_position,0.404256918234076,1.5059533626902915,1364
+payload_detection/x650/0.5kg/1_scenario,IMU-only strapdown,vehicle_gps_position,45.834829576902834,86.95595508779716,1062
+payload_detection/x650/0.5kg/1_scenario,PX4 EKF local_position,vehicle_gps_position,0.22190501003196153,0.25545848471649024,1061
+payload_detection/x650/0.5kg/2_scenario,IMU-only strapdown,vehicle_gps_position,133.234571418189,344.2054969434917,1040
+payload_detection/x650/0.5kg/2_scenario,PX4 EKF local_position,vehicle_gps_position,0.1983393876398056,0.13704988863351916,1039
+payload_detection/x650/0.5kg/3_scenario,IMU-only strapdown,vehicle_gps_position,151.84147196959157,442.12472373399913,1337
+payload_detection/x650/0.5kg/3_scenario,PX4 EKF local_position,vehicle_gps_position,0.2715766551874734,0.3667279522817716,1337
+payload_detection/x650/0.5kg/4_scenario,IMU-only strapdown,vehicle_gps_position,602.7531406162885,866.7487700876978,2290
+payload_detection/x650/0.5kg/4_scenario,PX4 EKF local_position,vehicle_gps_position,0.14188945615163076,0.10463639958345121,2290
+payload_detection/x650/0.5kg/5_scenario,IMU-only strapdown,vehicle_gps_position,107.29629153558173,223.684746591671,1231
+payload_detection/x650/0.5kg/5_scenario,PX4 EKF local_position,vehicle_gps_position,0.1819540293754635,0.1407750661364207,1231
+payload_detection/x650/1.5kg/1_scenario,IMU-only strapdown,vehicle_gps_position,45.834829576902834,86.95595508779716,1062
+payload_detection/x650/1.5kg/1_scenario,PX4 EKF local_position,vehicle_gps_position,0.22190501003196153,0.25545848471649024,1061
+payload_detection/x650/1.5kg/2_scenario,IMU-only strapdown,vehicle_gps_position,125.11707577053824,361.34764770832675,1286
+payload_detection/x650/1.5kg/2_scenario,PX4 EKF local_position,vehicle_gps_position,0.1521022949653568,0.22365140311248027,1286
+payload_detection/x650/1.5kg/3_scenario,IMU-only strapdown,vehicle_gps_position,312.4813732628195,385.8947310365668,1576
+payload_detection/x650/1.5kg/3_scenario,PX4 EKF local_position,vehicle_gps_position,0.16563729656089146,0.10170958942779343,1576
+payload_detection/x650/1.5kg/4_scenario,IMU-only strapdown,vehicle_gps_position,197.51842642005306,253.9452578689457,1535
+payload_detection/x650/1.5kg/4_scenario,PX4 EKF local_position,vehicle_gps_position,0.17163278648405522,0.1909427571139287,1535
+payload_detection/x650/1.5kg/5_scenario,IMU-only strapdown,vehicle_gps_position,225.12441364575156,474.8613194521532,1185
+payload_detection/x650/1.5kg/5_scenario,PX4 EKF local_position,vehicle_gps_position,0.2281494098722073,0.36679366516609396,1185
+payload_detection/x650/1kg/1_scenario,IMU-only strapdown,vehicle_gps_position,45.834829576902834,86.95595508779716,1062
+payload_detection/x650/1kg/1_scenario,PX4 EKF local_position,vehicle_gps_position,0.22190501003196153,0.25545848471649024,1061
+payload_detection/x650/1kg/2_scenario,IMU-only strapdown,vehicle_gps_position,207.33104440325832,600.5709976482239,1326
+payload_detection/x650/1kg/2_scenario,PX4 EKF local_position,vehicle_gps_position,0.16525894191051757,0.1874042857367125,1326
+payload_detection/x650/1kg/3_scenario,IMU-only strapdown,vehicle_gps_position,77.86578891540195,83.53660610919066,1355
+payload_detection/x650/1kg/3_scenario,PX4 EKF local_position,vehicle_gps_position,0.19115942746410367,0.16303269137703524,1354
+payload_detection/x650/1kg/4_scenario,IMU-only strapdown,vehicle_gps_position,189.80825866480185,176.65108881414932,1995
+payload_detection/x650/1kg/4_scenario,PX4 EKF local_position,vehicle_gps_position,0.17693553589032954,0.09569016067757177,1995
+payload_detection/x650/1kg/5_scenario,IMU-only strapdown,vehicle_gps_position,116.22874603359749,205.91378926998692,1439
+payload_detection/x650/1kg/5_scenario,PX4 EKF local_position,vehicle_gps_position,0.19310274596750074,0.2694936698464771,1439
+payload_detection/x650/2kg/1_scenario,IMU-only strapdown,vehicle_gps_position,45.834829576902834,86.95595508779716,1062
+payload_detection/x650/2kg/1_scenario,PX4 EKF local_position,vehicle_gps_position,0.22190501003196153,0.25545848471649024,1061
+payload_detection/x650/2kg/2_scenario,IMU-only strapdown,vehicle_gps_position,149.82609461450065,370.2754622685319,1280
+payload_detection/x650/2kg/2_scenario,PX4 EKF local_position,vehicle_gps_position,0.199295151940111,0.24171918795381941,1279
+payload_detection/x650/2kg/3_scenario,IMU-only strapdown,vehicle_gps_position,1296.4834350583453,2322.820267253881,1740
+payload_detection/x650/2kg/3_scenario,PX4 EKF local_position,vehicle_gps_position,0.2997438132895227,0.40466356430195477,1740
+payload_detection/x650/2kg/4_scenario,IMU-only strapdown,vehicle_gps_position,408.2039170269817,441.1366668271629,2552
+payload_detection/x650/2kg/4_scenario,PX4 EKF local_position,vehicle_gps_position,0.15483923483863188,0.03510388487137013,2552
+payload_detection/x650/2kg/5_scenario,IMU-only strapdown,vehicle_gps_position,352.95894678434803,668.262227700941,1631
+payload_detection/x650/2kg/5_scenario,PX4 EKF local_position,vehicle_gps_position,0.20528746153996222,0.20177677212167014,1630

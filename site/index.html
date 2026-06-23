@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DroneLog Devkit Benchmarks</title>
+  <style>
+    :root {
+      --ink: #17202a;
+      --muted: #5c6670;
+      --line: #d9e0e7;
+      --soft: #f6f8fa;
+      --accent: #0b6b75;
+      --accent-2: #7a4f01;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      line-height: 1.55;
+      background: #ffffff;
+    }
+    header {
+      padding: 56px 24px 36px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #f8fbfc, #ffffff);
+    }
+    main {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 32px 24px 56px;
+    }
+    .wrap { max-width: 1120px; margin: 0 auto; }
+    h1 { margin: 0 0 12px; font-size: 42px; letter-spacing: 0; }
+    h2 { margin: 42px 0 14px; font-size: 26px; }
+    h3 { margin: 26px 0 10px; font-size: 20px; }
+    p { margin: 0 0 14px; color: var(--muted); }
+    code, pre {
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 14px;
+    }
+    pre {
+      overflow: auto;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--soft);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0 22px;
+      font-size: 14px;
+    }
+    th, td {
+      border-bottom: 1px solid var(--line);
+      padding: 10px 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { color: var(--ink); background: var(--soft); }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin: 20px 0;
+    }
+    .tile {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      background: #fff;
+    }
+    .tile strong { display: block; margin-bottom: 6px; }
+    .tag {
+      display: inline-block;
+      margin: 0 6px 8px 0;
+      padding: 3px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--accent);
+      background: #f2fbfc;
+      font-size: 13px;
+    }
+    figure { margin: 24px 0 34px; }
+    img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    figcaption {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    a { color: var(--accent); }
+    .note {
+      border-left: 4px solid var(--accent-2);
+      padding: 12px 14px;
+      background: #fff8ea;
+      color: #55401b;
+      margin: 18px 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>DroneLog Devkit Benchmarks</h1>
+      <p>ULog-native, terminal-runnable benchmark scripts for UAV telemetry: classification, regression, navigation, and event detection.</p>
+      <span class="tag">PX4 ULog</span>
+      <span class="tag">pyulog</span>
+      <span class="tag">grouped CV</span>
+      <span class="tag">GPS/EKF navigation</span>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <h2>Runnable Devkit</h2>
+      <p>The scripts read raw <code>.ulg</code> files directly and discover topic fields from each log schema. Run from the repository root:</p>
+      <pre><code>venv/bin/python scripts/task1_frame_classification.py --data . --out outputs
+venv/bin/python scripts/task2_payload_classification.py --data . --out outputs
+venv/bin/python scripts/task3_mass_regression.py --data . --out outputs
+venv/bin/python scripts/task4_navigation_odometry.py --data . --out outputs
+venv/bin/python scripts/task5_event_detection.py --data . --out outputs</code></pre>
+    </section>
+
+    <section>
+      <h2>Five Benchmark Families</h2>
+      <div class="grid">
+        <div class="tile"><strong>Task 1: Frame classification</strong><p>IMU-window features classify frame size. Random Forest accuracy: 0.970.</p></div>
+        <div class="tile"><strong>Task 2: Payload scenario</strong><p>Scenario classification remains intentionally hard. Random Forest accuracy: 0.342.</p></div>
+        <div class="tile"><strong>Task 3: Mass regression</strong><p>Continuous carried-mass estimation with motor-command features and per-platform reporting.</p></div>
+        <div class="tile"><strong>Task 4: Navigation</strong><p>IMU-only drift and PX4 EKF are scored against projected raw GPS truth.</p></div>
+        <div class="tile"><strong>Task 5: Event detection</strong><p>Cruise-only thrust change detection for pickup/drop events on a takeoff-relative timebase.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Extended Benchmark Results</h2>
+      <h3>Task 3: Payload-Mass Regression</h3>
+      <table>
+        <thead><tr><th>Platform</th><th>Model</th><th>MAE kg</th><th>RMSE kg</th><th>R2</th><th>Windows</th><th>Groups</th></tr></thead>
+        <tbody>
+          <tr><td>combined</td><td>RandomForestRegressor</td><td>0.266</td><td>0.462</td><td>0.521</td><td>1338</td><td>35</td></tr>
+          <tr><td>combined</td><td>Ridge</td><td>0.384</td><td>0.523</td><td>0.388</td><td>1338</td><td>35</td></tr>
+          <tr><td>x500v2</td><td>RandomForestRegressor</td><td>0.117</td><td>0.210</td><td>0.701</td><td>564</td><td>15</td></tr>
+          <tr><td>x500v2</td><td>Ridge</td><td>0.142</td><td>0.210</td><td>0.700</td><td>564</td><td>15</td></tr>
+          <tr><td>x650</td><td>RandomForestRegressor</td><td>0.357</td><td>0.558</td><td>0.486</td><td>774</td><td>20</td></tr>
+          <tr><td>x650</td><td>Ridge</td><td>0.449</td><td>0.631</td><td>0.343</td><td>774</td><td>20</td></tr>
+        </tbody>
+      </table>
+      <figure>
+        <img src="../outputs/task3_mass_scatter.png" alt="Task 3 combined mass regression scatter">
+        <figcaption>Combined predicted-vs-true carried payload mass.</figcaption>
+      </figure>
+      <figure>
+        <img src="../outputs/task3_mass_scatter_x500v2.png" alt="Task 3 x500v2 mass regression scatter">
+        <figcaption>x500v2-only regression removes the cross-platform shortcut.</figcaption>
+      </figure>
+      <figure>
+        <img src="../outputs/task3_mass_scatter_x650.png" alt="Task 3 x650 mass regression scatter">
+        <figcaption>x650-only regression over the wider mass range.</figcaption>
+      </figure>
+
+      <h3>Task 4: Navigation/Odometry</h3>
+      <table>
+        <thead><tr><th>Method</th><th>Truth</th><th>ATE-RMSE m</th><th>Final drift %</th></tr></thead>
+        <tbody>
+          <tr><td>IMU-only strapdown</td><td>vehicle_gps_position</td><td>276.915</td><td>496.697</td></tr>
+          <tr><td>PX4 EKF local_position</td><td>vehicle_gps_position</td><td>1.233</td><td>1.537</td></tr>
+        </tbody>
+      </table>
+      <p>Altitude scaling was spot-checked on <code>d250_1</code>: raw GPS altitude median <code>27396</code> projects to a vertical range of <code>-2.98..5.07 m</code>, and EKF vertical RMS is <code>0.53 m</code>.</p>
+      <figure>
+        <img src="../outputs/task4_trajectory.png" alt="Task 4 trajectory and error plot">
+        <figcaption>GPS truth, EKF baseline, and aligned IMU-only trajectory.</figcaption>
+      </figure>
+
+      <h3>Task 5: Pickup/Drop Event Detection</h3>
+      <table>
+        <thead><tr><th>Method</th><th>Precision</th><th>Recall</th><th>Mean abs latency s</th></tr></thead>
+        <tbody>
+          <tr><td>thresholded_derivative</td><td>0.381</td><td>0.381</td><td>1.220</td></tr>
+          <tr><td>ruptures_pelt</td><td>0.452</td><td>0.452</td><td>1.499</td></tr>
+        </tbody>
+      </table>
+      <figure>
+        <img src="../outputs/task5_events.png" alt="Task 5 event detection statistic">
+        <figcaption>Cruise-only thrust statistic with true and detected events.</figcaption>
+      </figure>
+      <figure>
+        <img src="../outputs/task5_diagnostic_x500v2_0.5kg_s4.png" alt="Task 5 diagnostic plot">
+        <figcaption>Diagnostic plot for x500v2/0.5kg scenario 4 on the takeoff-relative time axis.</figcaption>
+      </figure>
+    </section>
+
+    <section>
+      <h2>Limitations</h2>
+      <div class="note">Mass and airframe are partially confounded. Use per-platform Task 3 results for the cleaner dynamics readout.</div>
+      <div class="note">Task 4 uses onboard GPS-level truth, not motion-capture ground truth. EKF results should be read as agreement with GPS.</div>
+      <div class="note">Task 5 evaluates against paper-level pickup/drop annotations; motor thrust changes can lead the annotated moment by a few seconds.</div>
+    </section>
+  </main>
+</body>
+</html>
