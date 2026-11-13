@@ -1,0 +1,6 @@
+,pred_S1,pred_S2,pred_S3,pred_S4,pred_S5
+true_S1,19,0,0,1,1
+true_S2,0,18,2,1,0
+true_S3,0,0,17,4,0
+true_S4,2,0,4,14,1
+true_S5,1,1,0,0,19

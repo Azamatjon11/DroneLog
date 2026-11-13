@@ -17,6 +17,7 @@ class FlightRecord:
     platform: str | None = None
     mass_kg: float | None = None
     scenario: int | None = None
+    trial: int | None = None
 
 
 def relative_stem(path: Path, root: Path) -> str:
@@ -42,10 +43,10 @@ def parse_frame_record(path: Path, root: Path) -> FlightRecord:
 
 
 def parse_payload_record(path: Path, root: Path) -> FlightRecord:
-    """Parse a payload record such as ``x500v2/0.75kg/3_scenario.ulg``."""
+    """Parse a payload record such as ``x500v2/0.75kg/3_scenario_t2.ulg`` (v1.1) or ``3_scenario.ulg`` (v1.0)."""
 
     mass_match = re.fullmatch(r"([0-9]+(?:\.[0-9]+)?)kg", path.parent.name, flags=re.IGNORECASE)
-    scenario_match = re.fullmatch(r"(\d+)_scenario", path.stem, flags=re.IGNORECASE)
+    scenario_match = re.match(r"(\d+)_scenario(?:_t(\d+))?", path.stem, flags=re.IGNORECASE)
     if not mass_match:
         raise ValueError(f"Cannot parse payload mass from parent folder: {path.parent}")
     if not scenario_match:
@@ -56,4 +57,5 @@ def parse_payload_record(path: Path, root: Path) -> FlightRecord:
         platform=path.parent.parent.name.lower(),
         mass_kg=float(mass_match.group(1)),
         scenario=int(scenario_match.group(1)),
+        trial=int(scenario_match.group(2)) if scenario_match.group(2) else None,
     )

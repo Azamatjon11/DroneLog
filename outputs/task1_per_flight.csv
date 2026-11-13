@@ -1,0 +1,16 @@
+file,label,windows,accuracy
+log/frame_size/250mm/d250_1.ulg,250mm,18,1.0
+log/frame_size/250mm/d250_2.ulg,250mm,18,0.9444444444444444
+log/frame_size/250mm/d250_3.ulg,250mm,12,0.9166666666666666
+log/frame_size/450mm/d450_1.ulg,450mm,20,0.95
+log/frame_size/450mm/d450_2.ulg,450mm,14,0.7857142857142857
+log/frame_size/450mm/d450_3.ulg,450mm,16,0.875
+log/frame_size/500mm/d500_1.ulg,500mm,33,1.0
+log/frame_size/500mm/d500_2.ulg,500mm,22,1.0
+log/frame_size/500mm/d500_3.ulg,500mm,22,1.0
+log/frame_size/650mm/d650_1.ulg,650mm,24,0.9583333333333334
+log/frame_size/650mm/d650_2.ulg,650mm,24,1.0
+log/frame_size/650mm/d650_3.ulg,650mm,21,0.9523809523809523
+log/frame_size/680mm/d680_1.ulg,680mm,42,0.9523809523809523
+log/frame_size/680mm/d680_2.ulg,680mm,24,1.0
+log/frame_size/680mm/d680_3.ulg,680mm,22,0.8636363636363636

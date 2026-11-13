@@ -1,4 +1,4 @@
-"""Payload pickup/drop annotations from the DroneLog paper Table 4."""
+"""Payload pickup/drop annotations (DroneLog v1.1: ``metadata/events.csv``)."""
 
 from __future__ import annotations
 
@@ -6,54 +6,17 @@ from pathlib import Path
 import csv
 
 
-# Paper Table 4, seconds into flight. Scenarios 1 and 2 have no transitions.
-PAPER_TABLE_4: dict[tuple[str, float, int], dict[str, float | None]] = {
-    ("x500v2", 0.5, 3): {"pickup": 84.0, "drop": None},
-    ("x500v2", 0.5, 4): {"pickup": 103.0, "drop": 179.0},
-    ("x500v2", 0.5, 5): {"pickup": None, "drop": 88.0},
-    ("x500v2", 0.75, 3): {"pickup": 124.0, "drop": None},
-    ("x500v2", 0.75, 4): {"pickup": 115.0, "drop": 208.0},
-    ("x500v2", 0.75, 5): {"pickup": None, "drop": 103.0},
-    ("x500v2", 1.0, 3): {"pickup": 138.0, "drop": None},
-    ("x500v2", 1.0, 4): {"pickup": 100.0, "drop": 166.0},
-    ("x500v2", 1.0, 5): {"pickup": None, "drop": 82.0},
-    ("x650", 0.5, 3): {"pickup": 101.0, "drop": None},
-    ("x650", 0.5, 4): {"pickup": 128.0, "drop": 231.0},
-    ("x650", 0.5, 5): {"pickup": None, "drop": 189.0},
-    ("x650", 1.0, 3): {"pickup": 98.0, "drop": None},
-    ("x650", 1.0, 4): {"pickup": 109.0, "drop": 185.0},
-    ("x650", 1.0, 5): {"pickup": None, "drop": 125.0},
-    ("x650", 1.5, 3): {"pickup": 149.0, "drop": None},
-    ("x650", 1.5, 4): {"pickup": 94.0, "drop": 168.0},
-    ("x650", 1.5, 5): {"pickup": None, "drop": 335.0},
-    ("x650", 2.0, 3): {"pickup": 120.0, "drop": None},
-    ("x650", 2.0, 4): {"pickup": 168.0, "drop": 323.0},
-    ("x650", 2.0, 5): {"pickup": None, "drop": 335.0},
-}
+def load_event_table(events_csv: str | Path) -> dict[tuple[str, float, int, int], dict[str, float | None]]:
+    """Read ``metadata/events.csv`` into {(platform, mass_kg, scenario, trial): {"pickup": s, "drop": s}}.
 
-
-def _parse_seconds(value: str | None) -> float | None:
-    if value is None or str(value).strip() == "":
-        return None
-    return float(value)
-
-
-def load_event_table(events_csv: str | Path | None = None) -> dict[tuple[str, float, int], dict[str, float | None]]:
-    """Return Paper Table 4 annotations, optionally overridden by a CSV file.
-
-    CSV override columns: ``platform,mass_kg,scenario,pickup,drop``.
-    Blank pickup/drop values are treated as no event.
+    Times are seconds after arming (log start). Scenarios 1 and 2 have no events.
     """
 
-    table = dict(PAPER_TABLE_4)
-    if events_csv is None:
-        return table
-
+    table: dict[tuple[str, float, int, int], dict[str, float | None]] = {}
     with Path(events_csv).open(newline="") as handle:
-        reader = csv.DictReader(handle)
-        for row in reader:
-            key = (row["platform"].strip().lower(), float(row["mass_kg"]), int(row["scenario"]))
-            table[key] = {"pickup": _parse_seconds(row.get("pickup")), "drop": _parse_seconds(row.get("drop"))}
+        for row in csv.DictReader(handle):
+            key = (row["platform"].strip().lower(), float(row["payload_mass_kg"]), int(row["scenario"]), int(row["trial"]))
+            table.setdefault(key, {"pickup": None, "drop": None})[row["event"]] = float(row["time_s"])
     return table
 
 
@@ -61,12 +24,12 @@ def get_events(
     platform: str,
     mass_kg: float,
     scenario: int,
-    table: dict[tuple[str, float, int], dict[str, float | None]] | None = None,
+    trial: int,
+    table: dict[tuple[str, float, int, int], dict[str, float | None]],
 ) -> dict[str, float | None]:
-    """Return pickup/drop seconds for one payload condition."""
+    """Return pickup/drop seconds for one payload flight."""
 
-    table = table or PAPER_TABLE_4
-    return table.get((platform.lower(), float(mass_kg), int(scenario)), {"pickup": None, "drop": None})
+    return table.get((platform.lower(), float(mass_kg), int(scenario), int(trial)), {"pickup": None, "drop": None})
 
 
 def carried_mass_for_window(

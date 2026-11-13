@@ -1,34 +1,40 @@
 # DroneLog Devkit
 
-Benchmark scripts for UAV flight telemetry stored as PX4 ULog (`.ulg`) files.
-The devkit reads raw ULog files directly with `pyulog`; topic and field names
-come from each log's schema. The scripts do not guess CSV headers or hardcode
-sensor column names.
+Baseline scripts for the DroneLog dataset of PX4 flight logs (`.ulg`).
+The devkit reads raw ULog files directly with `pyulog` and the dataset's
+machine-readable metadata (`metadata/flights.csv`, `metadata/events.csv`).
+
+**Version 1.1** of the devkit accompanies the revised paper *DroneLog: A
+Real-Flight PX4 Telemetry Dataset for UAV Payload Transition Analysis and
+Platform Identification* and the DroneLog v1.1 dataset. `python run_all.py
+--data <dataset_root>` regenerates every result table of the paper.
 
 ## Abstract
 
-DroneLog Devkit provides reproducible benchmark scripts for a UAV flight
-telemetry dataset recorded as PX4 ULog files. The devkit covers five task
-families: frame-size classification, payload-scenario classification,
-continuous payload-mass regression, navigation/odometry drift estimation, and
-online pickup/drop event detection. The baseline scripts are intentionally
-simple, terminal-runnable references that expose the dataset's classification,
-regression, navigation, and temporal-event surfaces while preserving the native
-ULog topic and field schema.
+DroneLog Devkit provides reproducible baselines for a UAV flight telemetry
+dataset recorded as PX4 ULog files. The revised paper uses four of its tasks:
+platform identification on the frame-size subset, payload state and
+flight-level scenario recognition, payload-mass estimation, and pickup/drop
+event detection. The baselines are intentionally simple, terminal-runnable
+references. A navigation/odometry script (Task 4) is kept from v1.0 but is
+not part of the revised paper.
 
 ## Contributions
 
 - ULog-native loading utilities with topic discovery, regex-based field
-  matching, parquet caching, and takeoff-relative flight time.
-- Two reproduced classification baselines: frame size and payload scenario.
-- Three extended benchmark tasks: payload mass regression, IMU/GPS/EKF
-  navigation scoring, and payload pickup/drop event detection.
-- Runnable scripts, generated CSV tables, generated PNG figures, and a static
-  devkit webpage in `site/index.html`.
+  matching and caching.
+- Baselines for platform identification, payload state, flight-level scenario,
+  payload mass and pickup/drop detection, evaluated with repeated
+  flight-grouped cross-validation and metadata-only controls.
+- `run_all.py`, which regenerates every result table of the revised paper with
+  fixed random seeds, plus per-flight predictions.
+- Generated CSV tables, PNG figures, and a static devkit webpage in
+  `site/index.html`.
 
 ## Install
 
-Use Python 3.10 or newer. Create a virtual environment first:
+Use Python 3.10 or newer (the paper's results were produced with Python 3.13 and the
+pinned versions in `requirements.txt`). Create a virtual environment first:
 
 ```bash
 python -m venv venv
@@ -66,170 +72,216 @@ python -m pip install -r requirements.txt
 
 ## Dataset Layout
 
-The scripts recurse from `--data` and parse labels from paths:
+Point `--data` at the root of the unpacked DroneLog v1.1 release:
 
 ```text
 dataset_root/
-  frame_size/
-    250mm/ d250_1.ulg ...
-    450mm/ d450_1.ulg ...
-    500mm/ d500_1.ulg ...
-    650mm/ d650_1.ulg ...
-    680mm/ d680_1.ulg ...
-  payload_detection/
-    x500v2/
-      0.5kg/ 1_scenario.ulg ...
-      0.75kg/ 1_scenario.ulg ...
-      1kg/ 1_scenario.ulg ...
-    x650/
-      0.5kg/ 1_scenario.ulg ...
-      1kg/ 1_scenario.ulg ...
-      1.5kg/ 1_scenario.ulg ...
-      2kg/ 1_scenario.ulg ...
+  log/
+    frame_size/
+      250mm/ d250_1.ulg d250_2.ulg d250_3.ulg
+      450mm/ ...  500mm/ ...  650mm/ ...  680mm/ ...
+    payload/
+      x500v2/
+        0.5kg/ 1_scenario_t1.ulg ... 5_scenario_t3.ulg
+        0.75kg/ ...  1kg/ ...
+      x650/
+        0.5kg/ ...  1kg/ ...  1.5kg/ ...  2kg/ ...
+  csv/          same layout; one <log>_csvs/ folder of CSV files per log
+  metadata/
+    flights.csv one row per log (platform, mass, scenario, trial, pilot, date,
+                duration, firmware, IMU rate, battery, GNSS quality, MD5, ...)
+    events.csv  pickup/drop times in seconds after arming (log start)
 ```
 
-Frame labels come from folders like `250mm`. Payload labels come from platform,
-mass, and scenario folders/files. Grouped cross-validation uses the full
-relative path stem as the flight ID.
+`<s>_scenario_t<k>.ulg` is scenario `s` (1-5), trial `k` (1-3).
+`1_scenario_t1.ulg` is the shared trial-1 no-payload flight of each platform,
+so the same file appears in every mass folder of that platform. Labels,
+grouping and event times are read from `metadata/`; flights with identical
+MD5 checksums always share a cross-validation group.
 
 ## Run Commands
 
-```bash
-python scripts/task1_frame_classification.py --data . --out outputs
-python scripts/task2_payload_classification.py --data . --out outputs
-python scripts/task3_mass_regression.py --data . --out outputs
-python scripts/task4_navigation_odometry.py --data . --out outputs
-python scripts/task5_event_detection.py --data . --out outputs
-```
-
-Every script supports:
+Regenerate every result of the revised paper:
 
 ```bash
---data <dataset_root> --out outputs/ --inspect --no-cache
+python run_all.py --data <dataset_root> --out outputs
 ```
 
-Use `--inspect` before a full run to print topics from a sample flight and the
-fields matched for that task. Missing topics or fields are reported per flight;
-the scripts skip those flights and continue.
+or run the tasks one by one:
+
+```bash
+python scripts/task1_frame_classification.py   --data <dataset_root> --out outputs
+python scripts/task2_payload_classification.py --data <dataset_root> --out outputs
+python scripts/task3_mass_regression.py        --data <dataset_root> --out outputs
+python scripts/task5_event_detection.py        --data <dataset_root> --out outputs
+```
+
+The first run parses each log once and caches the signals in `.cache/`
+(use `--no-cache` to force a fresh parse). Every script uses fixed random
+seeds: repetition `r` of the cross-validation uses `random_state=r`.
+
+Task 4 (navigation, v1.0) is not part of the revised paper and keeps its v1.0
+interface:
+
+```bash
+python scripts/task4_navigation_odometry.py --data <dataset_root> --out outputs
+```
 
 ## Outputs
 
 All outputs are written under `outputs/` by default:
 
-- `task1_frame_results.csv`: frame-size classification accuracy, macro-F1,
-  macro-precision, macro-recall, windows, groups, folds.
-- `task2_payload_results.csv`: payload-scenario classification metrics.
-- `task3_mass_results.csv`: payload mass regression MAE, RMSE, R2, windows,
-  groups, folds.
-- `task3_mass_results_x500v2.csv` and `task3_mass_results_x650.csv`:
-  per-platform payload mass regression metrics.
-- `task3_mass_scatter.png`: predicted-vs-true carried payload mass.
-- `task3_mass_scatter_x500v2.png` and `task3_mass_scatter_x650.png`:
-  per-platform predicted-vs-true carried payload mass figures.
-- `task4_navigation_results.csv`: ATE-RMSE and final drift percent for IMU-only
-  and PX4 EKF tracks.
-- `task4_trajectory.png`: top-down trajectory and IMU-only error over time.
-- `task5_event_results.csv`: pickup/drop detection latency, precision, recall,
-  and counts.
-- `task5_events.png`: detection statistic with true and detected events.
-- `task5_diagnostic_x500v2_0.5kg_s4.png`: diagnostic event plot for the
-  representative `x500v2/0.5kg/4_scenario` flight.
+- `task1_frame_results.csv`: platform identification (Table 7): accuracy,
+  macro-F1 (mean and s.d. over 10 repetitions), precision, recall, windows,
+  groups, for 2/5/10 s windows plus the metadata-only and 200 Hz controls.
+- `task1_per_flight.csv`: per-flight accuracy (Random Forest, 5 s, repetition 0).
+- `task2_payload_results.csv`: payload state (Table 8), including the
+  metadata-only, IMU-only, cross-session and per-platform rows.
+- `task2_payload_per_flight.csv`: per-flight payload-state accuracy.
+- `task2_scenario_results.csv`, `task2_scenario_confusion.csv`,
+  `task2_scenario_per_flight.csv`: flight-level scenario recognition, its
+  confusion matrix and the predicted scenario of every flight.
+- `task3_mass_results.csv` (and `task3_mass_results_x500v2.csv`,
+  `task3_mass_results_x650.csv`): mass estimation per platform (Table 9) with
+  MAE per carried mass (Table 10), mean predictor, metadata-only control and
+  cross-session split.
+- `task3_mass_unseen.csv`: error on payload masses held out from training.
+- `task3_mass_scatter.png` / `.pdf` (and per-platform PNGs): predicted versus
+  true carried mass on held-out flights.
+- `task5_event_results.csv`: pickup/drop detection (Table 11): precision,
+  recall and F1 at tau = 1, 2, 5 s, false alarms per minute, median latency.
+- `task5_detections_per_flight.csv`: every detection on every scored flight.
+- `task5_events.png` / `.pdf`: detection example on one held-out flight.
+- `task4_navigation_results.csv`, `task4_trajectory.png`: v1.0 navigation
+  outputs (not regenerated by `run_all.py`).
 
-## Extended Benchmark Tasks
+## Results
 
-Tasks 3-5 extend the original classification baselines into regression,
-navigation, and temporal event detection. All results below were regenerated
-from the checked-in scripts with `python ... --data . --out outputs` after
-activating the virtual environment.
+All numbers below are produced by `python run_all.py --data <dataset_root>` on DroneLog v1.1
+(mean ± s.d. over 10 repetitions of flight-grouped cross-validation unless stated otherwise).
 
-### Task 3: Payload-Mass Regression
+### Task 1: Platform Identification (paper Table 7)
 
-The mass benchmark estimates carried payload mass from IMU statistics and
-motor-command features. The combined score is retained as a reference, but the
-primary readout is per-platform because payload masses are not fully crossed
-with airframe: `1.5kg` and `2kg` appear only on `x650`.
+Five vehicles (250-680 mm), one per class. The metadata-only control shows that the vehicles can be
+told apart from hardware and software signatures alone, so this is platform identification, not
+evidence that frame geometry is learned.
 
-| Platform | Model | MAE (kg) | RMSE (kg) | R2 | Windows | Groups |
-|---|---:|---:|---:|---:|---:|---:|
-| combined | RandomForestRegressor | 0.266 | 0.462 | 0.521 | 1338 | 35 |
-| combined | Ridge | 0.384 | 0.523 | 0.388 | 1338 | 35 |
-| x500v2 | RandomForestRegressor | 0.117 | 0.210 | 0.701 | 564 | 15 |
-| x500v2 | Ridge | 0.142 | 0.210 | 0.700 | 564 | 15 |
-| x650 | RandomForestRegressor | 0.357 | 0.558 | 0.486 | 774 | 20 |
-| x650 | Ridge | 0.449 | 0.631 | 0.343 | 774 | 20 |
+| Window | Model | Accuracy | Macro-F1 |
+|---|---|---:|---:|
+| 2 s | Random Forest | 0.974 ± 0.002 | 0.974 ± 0.003 |
+| 2 s | SVM | 0.926 ± 0.001 | 0.921 ± 0.001 |
+| 2 s | KNN | 0.880 ± 0.004 | 0.877 ± 0.005 |
+| 2 s | Logistic Regression | 0.896 ± 0.005 | 0.886 ± 0.006 |
+| 5 s | Random Forest | 0.959 ± 0.005 | 0.958 ± 0.005 |
+| 5 s | SVM | 0.927 ± 0.004 | 0.922 ± 0.003 |
+| 5 s | KNN | 0.897 ± 0.004 | 0.892 ± 0.005 |
+| 5 s | Logistic Regression | 0.919 ± 0.004 | 0.914 ± 0.005 |
+| 10 s | Random Forest | 0.980 ± 0.009 | 0.978 ± 0.010 |
+| 10 s | SVM | 0.932 ± 0.004 | 0.922 ± 0.004 |
+| 10 s | KNN | 0.915 ± 0.006 | 0.912 ± 0.006 |
+| 10 s | Logistic Regression | 0.973 ± 0.003 | 0.969 ± 0.003 |
+| 5 s | Metadata only (RF) | 1.000 ± 0.000 | 1.000 ± 0.000 |
+| 5 s | Random Forest, resampled to 200 Hz | 0.956 ± 0.006 | 0.955 ± 0.006 |
 
-Figures:
+### Task 2: Payload State and Flight-Level Scenario (paper Table 8)
 
-![Task 3 combined scatter](outputs/task3_mass_scatter.png)
+Payload state: is a payload attached in the window? Windows within 1 s of an event are excluded.
 
-![Task 3 x500v2 scatter](outputs/task3_mass_scatter_x500v2.png)
-
-![Task 3 x650 scatter](outputs/task3_mass_scatter_x650.png)
-
-### Task 4: Navigation/Odometry
-
-The navigation benchmark integrates IMU acceleration to estimate position and
-scores it against independently projected GPS truth. PX4 EKF local position is
-scored as a strong baseline, not as ground truth. The table reports both
-per-flight median and mean values to match the paper's Table 8 and avoid
-confusing the mean with the median. Raw GPS altitude is scaled from millimeters
-when needed; a spot-check on `d250_1` gave raw GPS altitude median `27396` and
-projected GPS vertical range `-2.98..5.07 m`, with EKF vertical RMS `0.53 m`
-and horizontal RMS `0.66 m`.
-
-| Method | Truth | ATE-RMSE median (m) | ATE-RMSE mean (m) | Final Drift median (%) | Final Drift mean (%) |
+| Window | Model | Accuracy | Macro-F1 | Windows | Groups |
 |---|---|---:|---:|---:|---:|
-| IMU-only strapdown | vehicle_gps_position | 161.439 | 276.915 | 371.901 | 496.697 |
-| PX4 EKF local_position | vehicle_gps_position | 0.225 | 1.233 | 0.262 | 1.537 |
+| 2 s | Random Forest | 0.957 ± 0.004 | 0.956 ± 0.004 | 9645 | 99 |
+| 2 s | SVM | 0.957 ± 0.003 | 0.956 ± 0.003 | 9645 | 99 |
+| 2 s | KNN | 0.940 ± 0.003 | 0.940 ± 0.003 | 9645 | 99 |
+| 2 s | Logistic Regression | 0.896 ± 0.003 | 0.895 ± 0.003 | 9645 | 99 |
+| 5 s | Random Forest | 0.966 ± 0.004 | 0.966 ± 0.004 | 3764 | 99 |
+| 5 s | SVM | 0.965 ± 0.002 | 0.965 ± 0.002 | 3764 | 99 |
+| 5 s | KNN | 0.950 ± 0.002 | 0.949 ± 0.002 | 3764 | 99 |
+| 5 s | Logistic Regression | 0.931 ± 0.006 | 0.930 ± 0.006 | 3764 | 99 |
+| 5 s | Metadata only (RF) | 0.633 ± 0.020 | 0.623 ± 0.020 | 3764 | 99 |
+| 5 s | RF, IMU only | 0.943 ± 0.004 | 0.943 ± 0.004 | 3764 | 99 |
+| 5 s | Random Forest, train t1 -> test t2/t3 | 0.955 | 0.954 | 2479 | 69 |
+| 10 s | Random Forest | 0.973 ± 0.003 | 0.973 ± 0.003 | 1819 | 99 |
+| 10 s | SVM | 0.970 ± 0.002 | 0.969 ± 0.002 | 1819 | 99 |
+| 10 s | KNN | 0.959 ± 0.003 | 0.959 ± 0.003 | 1819 | 99 |
+| 10 s | Logistic Regression | 0.961 ± 0.002 | 0.961 ± 0.002 | 1819 | 99 |
 
-Figure:
+Flight-level scenario: which of the five scenarios was flown (one sample per flight).
 
-![Task 4 trajectory](outputs/task4_trajectory.png)
+| Model | Accuracy | Macro-F1 |
+|---|---:|---:|
+| Random Forest | 0.856 ± 0.014 | 0.855 ± 0.013 |
+| SVM | 0.693 ± 0.013 | 0.691 ± 0.014 |
+| KNN | 0.577 ± 0.031 | 0.583 ± 0.031 |
+| Logistic Regression | 0.793 ± 0.036 | 0.797 ± 0.035 |
+| Metadata only (RF) | 0.542 ± 0.043 | 0.534 ± 0.044 |
+| Random Forest, train t1 -> test t2/t3 | 0.814 | 0.819 |
 
-### Task 5: Pickup/Drop Event Detection
+### Task 3: Payload-Mass Estimation (paper Tables 9-10)
 
-The event benchmark detects payload transitions using a cruise-only,
-takeoff-relative thrust statistic. Detection is restricted to airborne cruise
-to avoid takeoff/landing transients dominating the signal. The diagnostic plot
-for `x500v2/0.5kg/4_scenario` places the Table 4 pickup/drop markers on the
-same `t_flight` axis as the statistic.
+Per platform; 5 s windows labelled with the mass carried at that time.
 
-| Method | Precision | Recall | Mean Abs. Latency (s) |
+| Platform | Model | MAE (kg) | RMSE (kg) | R2 |
+|---|---|---:|---:|---:|
+| x500v2 | Random Forest | 0.069 ± 0.002 | 0.132 | 0.889 |
+| x500v2 | Ridge | 0.130 ± 0.003 | 0.184 | 0.783 |
+| x500v2 | Mean predictor | 0.368 | 0.394 | 0.000 |
+| x500v2 | Metadata only (RF) | 0.364 ± 0.009 | 0.416 | -0.114 |
+| x500v2 | Random Forest, train t1 -> test t2/t3 | 0.096 | 0.158 | 0.844 |
+| x650 | Random Forest | 0.102 ± 0.005 | 0.225 | 0.908 |
+| x650 | Ridge | 0.219 ± 0.003 | 0.326 | 0.808 |
+| x650 | Mean predictor | 0.658 | 0.744 | 0.000 |
+| x650 | Metadata only (RF) | 0.651 ± 0.024 | 0.807 | -0.177 |
+| x650 | Random Forest, train t1 -> test t2/t3 | 0.149 | 0.265 | 0.868 |
+
+MAE (kg) per carried mass, Random Forest:
+
+| Platform | 0kg | 0.5kg | 0.75kg | 1kg | 1.5kg | 2kg |
+|---|---:|---:|---:|---:|---:|---:|
+| x500v2 | 0.030 | 0.098 | 0.122 | 0.143 | – | – |
+| x650 | 0.049 | 0.113 | – | 0.174 | 0.166 | 0.186 |
+
+Held-out (unseen) masses: Random Forest trained without any flight of that mass.
+
+| Platform | Held-out mass (kg) | MAE on loaded windows (kg) | Mean prediction (kg) |
 |---|---:|---:|---:|
-| thresholded_derivative | 0.381 | 0.381 | 1.220 |
-| ruptures_pelt | 0.452 | 0.452 | 1.499 |
+| x500v2 | 0.75 | 0.200 | 0.847 |
+| x650 | 1 | 0.491 | 0.794 |
+| x650 | 1.5 | 0.281 | 1.539 |
 
-Figures:
+![Task 3 mass scatter](outputs/task3_mass_scatter.png)
+
+### Task 5: Pickup/Drop Event Detection (paper Table 11)
+
+Cruise-phase mean motor command; parameters chosen on training flights only; one-to-one matching;
+scored on the 42 pickup/drop flights of trials 2-3 (56 events), tolerance tau = 2 s.
+
+| Detector | Event | Precision | Recall | F1 | False alarms / min | Median abs. latency (s) |
+|---|---|---:|---:|---:|---:|---:|
+| Thresholded change-point | pickup | 0.93 | 0.96 | 0.95 | 0.016 | 0.64 |
+| Thresholded change-point | drop | 0.84 | 0.96 | 0.90 | 0.041 | 0.34 |
+| Pelt change-point | pickup | 0.93 | 0.90 | 0.91 | 0.016 | 0.65 |
+| Pelt change-point | drop | 0.90 | 0.94 | 0.92 | 0.024 | 0.34 |
 
 ![Task 5 event detection](outputs/task5_events.png)
 
-![Task 5 diagnostic](outputs/task5_diagnostic_x500v2_0.5kg_s4.png)
+### Task 4: Navigation/Odometry (v1.0, not in the revised paper)
 
-## Expected Sanity Ranges
-
-- Task 1 should be highly separable; high frame-size classification accuracy is
-  expected.
-- Task 2 is intentionally hard; accuracy around `0.3` can be a correct outcome.
-- Task 3 reports error in kilograms. Heavier payloads should affect hover thrust
-  and dynamic response, but event timing and maneuvers make this a real
-  regression problem.
-- Task 4 should show IMU-only drift much larger than the EKF/GPS track. Large
-  inertial drift is expected; the benchmark quantifies it.
-- Task 5 should fire near annotated pickup/drop moments with modest latency, but
-  the simple baseline may miss events or produce false positives.
+The navigation script and its outputs (`task4_navigation_results.csv`, `task4_trajectory.png`) are kept from
+v1.0 for reference. The revised paper removed this task: the onboard GNSS is fused by the PX4 EKF, so it
+is not an independent reference for evaluating the estimator.
 
 ## Limitations
 
-- Payload mass and airframe are partially confounded. The combined Task 3 score
-  can exploit platform identity because `x650` includes heavier masses not
-  present on `x500v2`. Use the per-platform CSVs for the cleaner mass-dynamics
-  readout.
-- Task 4 uses GPS-level trajectory truth, not motion-capture or survey-grade
-  ground truth. EKF-vs-GPS ATE therefore measures agreement with onboard GPS,
-  not centimeter-level absolute accuracy.
-- Task 5 event annotations are paper-level pickup/drop timestamps. Motor-thrust
-  changes can begin a few seconds before the annotated event, so latency should
-  be interpreted as detection relative to those table annotations.
+- Each frame size and each payload platform is a single vehicle, so Task 1
+  measures platform identification and cannot separate frame geometry from
+  controller, IMU and firmware differences.
+- Pickup and drop times were labelled from the QGroundControl flight timer
+  (seconds after arming) and cross-checked against the flight log; their
+  uncertainty is about ±1 s.
+- `1_scenario_t1.ulg` is shared by all mass folders of a platform; identical
+  files are always kept in the same cross-validation group.
+- Payload flights were flown by two pilots at one site; wind and temperature
+  were not recorded.
 
 ## ULog-Native Design
 
@@ -247,14 +299,22 @@ from `actuator_motors` or `actuator_outputs`.
 
 ## Cache
 
-The first cached topic load parses the ULog and writes topic DataFrames to:
+Tasks 1, 2, 3 and 5 parse each log once and store the signals they use
+(IMU, mean motor command, battery voltage) in:
+
+```text
+.cache/signals/<md5-of-log>.npz
+```
+
+Task 4 caches whole topics instead. The first cached topic load parses the
+ULog and writes topic DataFrames to:
 
 ```text
 .cache/<sha1-of-absolute-ulg-path>/<topic>__instanceN.parquet
 ```
 
 Subsequent loads reuse parquet files if they are newer than the source ULog.
-Use `--no-cache` to force a fresh parse. Clear cached parquet files with:
+Use `--no-cache` to force a fresh parse. Clear all cached files with:
 
 ```bash
 python -m dronelog.clear_cache

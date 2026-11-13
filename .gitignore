@@ -1,6 +1,9 @@
-# Raw datasets
+# Raw datasets (v1.0 and v1.1 layouts)
 frame_size/
 payload_detection/
+/log/
+/csv/
+/metadata/
 *.ulg
 
 # Generated benchmark outputs

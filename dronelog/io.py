@@ -172,12 +172,22 @@ def _ulog_files(base: Path) -> list[Path]:
     return sorted([*base.rglob("*.ulg"), *base.rglob("*.ulog")])
 
 
+def _log_root(root: Path) -> Path:
+    # v1.1 release: ULog files live under <root>/log/
+    return root / "log" if (root / "log").is_dir() else root
+
+
 def _frame_base(root: Path) -> Path:
+    root = _log_root(root)
     return root / "frame_size" if (root / "frame_size").exists() else root
 
 
 def _payload_base(root: Path) -> Path:
-    return root / "payload_detection" if (root / "payload_detection").exists() else root
+    root = _log_root(root)
+    for name in ("payload", "payload_detection"):  # v1.1, v1.0
+        if (root / name).exists():
+            return root / name
+    return root
 
 
 def find_flights(root: str | Path, subset: str) -> list[FlightRecord]:
@@ -197,7 +207,7 @@ def find_flights(root: str | Path, subset: str) -> list[FlightRecord]:
     if subset in {"payload", "all"}:
         base = _payload_base(root_path)
         for path in _ulog_files(base):
-            if re.fullmatch(r"\d+_scenario", path.stem, flags=re.IGNORECASE):
+            if re.match(r"\d+_scenario(_t\d+)?", path.stem, flags=re.IGNORECASE):
                 records.append(parse_payload_record(path, root_path))
     return records
 
