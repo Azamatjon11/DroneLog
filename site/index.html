@@ -110,119 +110,102 @@
 <body>
   <header>
     <div class="wrap">
-      <h1>DroneLog Devkit v1.1</h1>
-      <p>Reproducible baselines for DroneLog v1.1: platform identification, payload state, payload mass and pickup/drop detection.</p>
+      <h1>DroneLog Devkit Benchmarks</h1>
+      <p>ULog-native, terminal-runnable benchmark scripts for UAV telemetry: classification, regression, navigation, and event detection.</p>
       <span class="tag">PX4 ULog</span>
       <span class="tag">pyulog</span>
       <span class="tag">grouped CV</span>
-      <span class="tag">metadata controls</span>
+      <span class="tag">GPS/EKF navigation</span>
     </div>
   </header>
 
   <main>
     <section>
       <h2>Runnable Devkit</h2>
-      <p>The scripts read the DroneLog v1.1 release (<code>log/</code> and <code>metadata/</code>). One command regenerates every result table of the revised paper:</p>
-      <pre><code>venv/bin/python run_all.py --data &lt;dataset_root&gt; --out outputs</code></pre>
-      <p>or task by task:</p>
-      <pre><code>venv/bin/python scripts/task1_frame_classification.py   --data &lt;dataset_root&gt; --out outputs
+      <p>The scripts read raw <code>.ulg</code> files directly and discover topic fields from each log schema. Run from the repository root:</p>
+      <pre><code>venv/bin/python run_all.py --data &lt;dataset_root&gt; --out outputs
+venv/bin/python scripts/task1_frame_classification.py --data &lt;dataset_root&gt; --out outputs
 venv/bin/python scripts/task2_payload_classification.py --data &lt;dataset_root&gt; --out outputs
-venv/bin/python scripts/task3_mass_regression.py        --data &lt;dataset_root&gt; --out outputs
-venv/bin/python scripts/task5_event_detection.py        --data &lt;dataset_root&gt; --out outputs</code></pre>
+venv/bin/python scripts/task3_mass_regression.py --data &lt;dataset_root&gt; --out outputs
+venv/bin/python scripts/task4_navigation_odometry.py --data &lt;dataset_root&gt; --out outputs
+venv/bin/python scripts/task5_event_detection.py --data &lt;dataset_root&gt; --out outputs</code></pre>
     </section>
 
     <section>
-      <h2>Benchmark Tasks</h2>
+      <h2>Five Benchmark Families</h2>
       <div class="grid">
-        <div class="tile"><strong>Task 1: Platform identification</strong><p>Identify which of five vehicles flew from IMU-window features. Random Forest accuracy (5 s): 0.959.</p></div>
-        <div class="tile"><strong>Task 2: Payload state and scenario</strong><p>Loaded or unloaded per window (RF 0.966); scenario per flight (RF 0.856).</p></div>
-        <div class="tile"><strong>Task 3: Mass estimation</strong><p>Carried mass per platform, with per-mass errors and held-out masses.</p></div>
-        <div class="tile"><strong>Task 4: Navigation (v1.0)</strong><p>Kept from v1.0 for reference; not part of the revised paper.</p></div>
-        <div class="tile"><strong>Task 5: Event detection</strong><p>Pickup/drop detection from the cruise-phase motor command, 2 s tolerance.</p></div>
+        <div class="tile"><strong>Task 1: Platform identification</strong><p>IMU-window features identify the platform. Random Forest accuracy: 0.959.</p></div>
+        <div class="tile"><strong>Task 2: Payload state</strong><p>Loaded/unloaded classification per window. Random Forest accuracy: 0.966.</p></div>
+        <div class="tile"><strong>Task 3: Mass regression</strong><p>Continuous carried-mass estimation with motor-command features and per-platform reporting.</p></div>
+        <div class="tile"><strong>Task 4: Navigation</strong><p>IMU-only drift and PX4 EKF are scored against projected raw GPS truth.</p></div>
+        <div class="tile"><strong>Task 5: Event detection</strong><p>Cruise-only thrust change detection for pickup/drop events on an arming-relative timebase.</p></div>
       </div>
     </section>
 
     <section>
-      <h2>Results</h2>
-      <p>Mean ± s.d. over 10 repetitions of flight-grouped cross-validation, DroneLog v1.1.</p>
-      <h3>Task 1: Platform Identification</h3>
+      <h2>Extended Benchmark Results</h2>
+      <h3>Task 3: Payload-Mass Regression</h3>
       <table>
-        <thead><tr><th>Window</th><th>Model</th><th>Accuracy</th><th>Macro-F1</th></tr></thead>
+        <thead><tr><th>Platform</th><th>Model</th><th>MAE kg</th><th>RMSE kg</th><th>R2</th><th>Windows</th><th>Groups</th></tr></thead>
         <tbody>
-          <tr><td>5 s</td><td>Random Forest</td><td>0.959 ± 0.005</td><td>0.958 ± 0.005</td></tr>
-          <tr><td>5 s</td><td>SVM</td><td>0.927 ± 0.004</td><td>0.922 ± 0.003</td></tr>
-          <tr><td>5 s</td><td>KNN</td><td>0.897 ± 0.004</td><td>0.892 ± 0.005</td></tr>
-          <tr><td>5 s</td><td>Logistic Regression</td><td>0.919 ± 0.004</td><td>0.914 ± 0.005</td></tr>
-          <tr><td>5 s</td><td>Metadata only (RF)</td><td>1.000 ± 0.000</td><td>1.000 ± 0.000</td></tr>
-          <tr><td>5 s</td><td>Random Forest, resampled to 200 Hz</td><td>0.956 ± 0.006</td><td>0.955 ± 0.006</td></tr>
-        </tbody>
-      </table>
-      <h3>Task 2: Payload State</h3>
-      <table>
-        <thead><tr><th>Model (5 s windows)</th><th>Accuracy</th><th>Macro-F1</th></tr></thead>
-        <tbody>
-          <tr><td>Random Forest</td><td>0.966 ± 0.004</td><td>0.966 ± 0.004</td></tr>
-          <tr><td>SVM</td><td>0.965 ± 0.002</td><td>0.965 ± 0.002</td></tr>
-          <tr><td>KNN</td><td>0.950 ± 0.002</td><td>0.949 ± 0.002</td></tr>
-          <tr><td>Logistic Regression</td><td>0.931 ± 0.006</td><td>0.930 ± 0.006</td></tr>
-          <tr><td>Metadata only (RF)</td><td>0.633 ± 0.020</td><td>0.623 ± 0.020</td></tr>
-          <tr><td>RF, IMU only</td><td>0.943 ± 0.004</td><td>0.943 ± 0.004</td></tr>
-          <tr><td>Random Forest, train t1 → test t2/t3</td><td>0.955</td><td>0.954</td></tr>
-        </tbody>
-      </table>
-      <h3>Task 2: Flight-Level Scenario</h3>
-      <table>
-        <thead><tr><th>Model</th><th>Accuracy</th><th>Macro-F1</th></tr></thead>
-        <tbody>
-          <tr><td>Random Forest</td><td>0.856 ± 0.014</td><td>0.855 ± 0.013</td></tr>
-          <tr><td>SVM</td><td>0.693 ± 0.013</td><td>0.691 ± 0.014</td></tr>
-          <tr><td>KNN</td><td>0.577 ± 0.031</td><td>0.583 ± 0.031</td></tr>
-          <tr><td>Logistic Regression</td><td>0.793 ± 0.036</td><td>0.797 ± 0.035</td></tr>
-          <tr><td>Metadata only (RF)</td><td>0.542 ± 0.043</td><td>0.534 ± 0.044</td></tr>
-          <tr><td>Random Forest, train t1 → test t2/t3</td><td>0.814</td><td>0.819</td></tr>
-        </tbody>
-      </table>
-      <h3>Task 3: Payload-Mass Estimation</h3>
-      <table>
-        <thead><tr><th>Platform</th><th>Model</th><th>MAE kg</th><th>RMSE kg</th><th>R2</th></tr></thead>
-        <tbody>
-          <tr><td>x500v2</td><td>Random Forest</td><td>0.069 ± 0.002</td><td>0.132</td><td>0.889</td></tr>
-          <tr><td>x500v2</td><td>Ridge</td><td>0.130 ± 0.003</td><td>0.184</td><td>0.783</td></tr>
-          <tr><td>x500v2</td><td>Mean predictor</td><td>0.368</td><td>0.394</td><td>0.000</td></tr>
-          <tr><td>x500v2</td><td>Metadata only (RF)</td><td>0.364 ± 0.009</td><td>0.416</td><td>-0.114</td></tr>
-          <tr><td>x500v2</td><td>Random Forest, train t1 → test t2/t3</td><td>0.096</td><td>0.158</td><td>0.844</td></tr>
-          <tr><td>x650</td><td>Random Forest</td><td>0.102 ± 0.005</td><td>0.225</td><td>0.908</td></tr>
-          <tr><td>x650</td><td>Ridge</td><td>0.219 ± 0.003</td><td>0.326</td><td>0.808</td></tr>
-          <tr><td>x650</td><td>Mean predictor</td><td>0.658</td><td>0.744</td><td>0.000</td></tr>
-          <tr><td>x650</td><td>Metadata only (RF)</td><td>0.651 ± 0.024</td><td>0.807</td><td>-0.177</td></tr>
-          <tr><td>x650</td><td>Random Forest, train t1 → test t2/t3</td><td>0.149</td><td>0.265</td><td>0.868</td></tr>
+          <tr><td>x500v2</td><td>RandomForestRegressor</td><td>0.069</td><td>0.132</td><td>0.889</td><td>1652</td><td>42</td></tr>
+          <tr><td>x500v2</td><td>Ridge</td><td>0.130</td><td>0.184</td><td>0.783</td><td>1652</td><td>42</td></tr>
+          <tr><td>x650</td><td>RandomForestRegressor</td><td>0.102</td><td>0.225</td><td>0.908</td><td>2112</td><td>57</td></tr>
+          <tr><td>x650</td><td>Ridge</td><td>0.219</td><td>0.326</td><td>0.808</td><td>2112</td><td>57</td></tr>
         </tbody>
       </table>
       <figure>
-        <img src="../outputs/task3_mass_scatter.png" alt="Task 3 mass estimation scatter">
-        <figcaption>Predicted versus true carried mass on held-out flights.</figcaption>
+        <img src="../outputs/task3_mass_scatter.png" alt="Task 3 combined mass regression scatter">
+        <figcaption>Predicted-vs-true carried payload mass (x500v2 and x650).</figcaption>
       </figure>
+      <figure>
+        <img src="../outputs/task3_mass_scatter_x500v2.png" alt="Task 3 x500v2 mass regression scatter">
+        <figcaption>x500v2-only regression removes the cross-platform shortcut.</figcaption>
+      </figure>
+      <figure>
+        <img src="../outputs/task3_mass_scatter_x650.png" alt="Task 3 x650 mass regression scatter">
+        <figcaption>x650-only regression over the wider mass range.</figcaption>
+      </figure>
+
+      <h3>Task 4: Navigation/Odometry</h3>
+      <table>
+        <thead><tr><th>Method</th><th>Truth</th><th>ATE-RMSE m</th><th>Final drift %</th></tr></thead>
+        <tbody>
+          <tr><td>IMU-only strapdown</td><td>vehicle_gps_position</td><td>276.915</td><td>496.697</td></tr>
+          <tr><td>PX4 EKF local_position</td><td>vehicle_gps_position</td><td>1.233</td><td>1.537</td></tr>
+        </tbody>
+      </table>
+      <p>Altitude scaling was spot-checked on <code>d250_1</code>: raw GPS altitude median <code>27396</code> projects to a vertical range of <code>-2.98..5.07 m</code>, and EKF vertical RMS is <code>0.53 m</code>.</p>
+      <figure>
+        <img src="../outputs/task4_trajectory.png" alt="Task 4 trajectory and error plot">
+        <figcaption>GPS truth, EKF baseline, and aligned IMU-only trajectory.</figcaption>
+      </figure>
+
       <h3>Task 5: Pickup/Drop Event Detection</h3>
       <table>
-        <thead><tr><th>Detector</th><th>Event</th><th>Precision</th><th>Recall</th><th>F1</th><th>False alarms / min</th><th>Median abs latency s</th></tr></thead>
+        <thead><tr><th>Method</th><th>Precision</th><th>Recall</th><th>Median abs latency s</th></tr></thead>
         <tbody>
-          <tr><td>Thresholded change-point</td><td>pickup</td><td>0.93</td><td>0.96</td><td>0.95</td><td>0.016</td><td>0.64</td></tr>
-          <tr><td>Thresholded change-point</td><td>drop</td><td>0.84</td><td>0.96</td><td>0.90</td><td>0.041</td><td>0.34</td></tr>
-          <tr><td>Pelt change-point</td><td>pickup</td><td>0.93</td><td>0.90</td><td>0.91</td><td>0.016</td><td>0.65</td></tr>
-          <tr><td>Pelt change-point</td><td>drop</td><td>0.90</td><td>0.94</td><td>0.92</td><td>0.024</td><td>0.34</td></tr>
+          <tr><td>thresholded_derivative (pickup)</td><td>0.931</td><td>0.964</td><td>0.636</td></tr>
+          <tr><td>thresholded_derivative (drop)</td><td>0.844</td><td>0.964</td><td>0.338</td></tr>
+          <tr><td>ruptures_pelt (pickup)</td><td>0.926</td><td>0.900</td><td>0.653</td></tr>
+          <tr><td>ruptures_pelt (drop)</td><td>0.900</td><td>0.936</td><td>0.335</td></tr>
         </tbody>
       </table>
       <figure>
-        <img src="../outputs/task5_events.png" alt="Task 5 event detection example">
-        <figcaption>Cruise-phase signal, step statistic and detections on a held-out flight.</figcaption>
+        <img src="../outputs/task5_events.png" alt="Task 5 event detection statistic">
+        <figcaption>Cruise-only thrust statistic with true and detected events.</figcaption>
+      </figure>
+      <figure>
+        <img src="../outputs/task5_diagnostic_x500v2_0.5kg_s4.png" alt="Task 5 diagnostic plot">
+        <figcaption>Diagnostic plot for x500v2/0.5kg scenario 4 on the takeoff-relative time axis.</figcaption>
       </figure>
     </section>
 
     <section>
       <h2>Limitations</h2>
-      <div class="note">Each frame size is a single vehicle, so Task 1 identifies the platform; it cannot separate frame geometry from controller, IMU and firmware.</div>
-      <div class="note">Pickup and drop times are manual labels (seconds after arming) with about ±1 s uncertainty.</div>
-      <div class="note">Task 4 uses onboard GPS-level truth, which the PX4 EKF also fuses; it is kept from v1.0 for reference only.</div>
+      <div class="note">Mass and airframe are partially confounded. Use per-platform Task 3 results for the cleaner dynamics readout.</div>
+      <div class="note">Task 4 uses onboard GPS-level truth, not motion-capture ground truth. EKF results should be read as agreement with GPS.</div>
+      <div class="note">Task 5 evaluates against manual pickup/drop annotations with about ±1 s uncertainty.</div>
     </section>
   </main>
 </body>

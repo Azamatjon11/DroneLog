@@ -139,9 +139,9 @@
 <header>
   <h1>DroneLog</h1>
   <p class="tagline">
-    A real-flight PX4 telemetry dataset for UAV payload transition analysis
-    and platform identification — with annotated mid-flight payload pickup
-    and drop events and reproducible baselines.
+    A real-world, multi-platform UAV flight telemetry dataset for platform
+    identification and payload state recognition — with benchmarks for
+    classification, regression, navigation, and event detection.
   </p>
   <div class="badges">
     <a href="https://doi.org/10.5281/zenodo.20279005">📦 Dataset (Zenodo)</a>
@@ -155,47 +155,44 @@
   <section>
     <h2>Overview</h2>
     <p>
-      DroneLog (version 1.1) contains <strong>120 real PX4 flight logs</strong>
-      (5&nbsp;h&nbsp;55&nbsp;min). Its main part is <strong>105 payload logs</strong>
-      from two quadrotors (Holybro X500&nbsp;V2 and X650) whose payload changes
-      during flight: five scenarios, several carried masses and three trials per
-      condition, flown by two pilots, with the pickup and drop times annotated.
-      A smaller subset of 15 logs from five vehicles (250&nbsp;mm–680&nbsp;mm)
-      supports platform identification. All data is released as native PX4 ULog
-      files and pre-extracted CSV files.
+      DroneLog is collected from <strong>five real quadrotor platforms</strong>
+      spanning five frame sizes (250&nbsp;mm–680&nbsp;mm) and two payload-capable
+      platforms (Holybro X500&nbsp;V2 and X650) flown outdoors under naturalistic,
+      unscripted conditions. All data is released as native PX4 ULog flight logs,
+      requiring no external cameras, motion capture, or additional sensing hardware.
     </p>
     <ul>
-      <li>105 payload logs: X500&nbsp;V2 (0.5 / 0.75 / 1&nbsp;kg) and X650 (0.5 / 1 / 1.5 / 2&nbsp;kg), 5 scenarios, 3 trials each</li>
-      <li>84 annotated pickup and drop times (seconds after arming, about ±1&nbsp;s)</li>
-      <li>15 frame-size logs from 5 vehicles (250 / 450 / 500 / 650 / 680&nbsp;mm) for platform identification</li>
-      <li>Full PX4 telemetry per flight: IMU, GNSS, attitude, local position, battery, motor commands</li>
-      <li>Machine-readable metadata (<code>flights.csv</code>, <code>events.csv</code>); native ULog and pre-extracted CSV files</li>
+      <li>5 quadrotor platforms across 5 frame sizes (250 / 450 / 500 / 650 / 680&nbsp;mm)</li>
+      <li>5 payload behavioral scenarios across multiple weight configurations (0.5–2&nbsp;kg)</li>
+      <li>Full PX4 telemetry per flight: IMU, GPS, attitude, local position, battery, actuator outputs</li>
+      <li>Ground-truth event timestamps for payload pickup and drop</li>
+      <li>Released in both native ULog and pre-extracted CSV formats</li>
     </ul>
   </section>
 
   <section>
     <h2>Benchmark Tasks</h2>
-    <p>The devkit reproduces every result table of the revised paper with one command (<code>python run_all.py --data &lt;dataset_root&gt;</code>):</p>
+    <p>The devkit ships five runnable baseline tasks covering four distinct problem types:</p>
     <div class="task-grid">
       <div class="task-card">
         <h3>1 · Platform Identification</h3>
-        <p>Identify which of the five vehicles flew, from windowed IMU statistics, with metadata-only and 200&nbsp;Hz controls.</p>
+        <p>Identify the platform from windowed IMU statistics.</p>
       </div>
       <div class="task-card">
-        <h3>2 · Payload State and Scenario</h3>
-        <p>Is a payload attached in this window? Which of the five scenarios was this flight?</p>
+        <h3>2 · Payload State Classification</h3>
+        <p>Classify whether a payload is attached, and the scenario of each flight.</p>
       </div>
       <div class="task-card">
-        <h3>3 · Payload-Mass Estimation</h3>
-        <p>Estimate the carried mass per platform, including masses held out from training.</p>
+        <h3>3 · Payload-Mass Regression</h3>
+        <p>Estimate carried payload mass as a continuous value.</p>
       </div>
       <div class="task-card">
-        <h3>4 · Navigation / Odometry (v1.0 only)</h3>
-        <p>IMU-only strapdown integration scored against GPS and EKF tracks. Kept from v1.0; not part of the revised paper.</p>
+        <h3>4 · Navigation / Odometry</h3>
+        <p>IMU-only strapdown integration scored against GPS and EKF tracks.</p>
       </div>
       <div class="task-card">
         <h3>5 · Pickup/Drop Event Detection</h3>
-        <p>Detect payload pickups and drops from the commanded thrust, scored with a 2&nbsp;s tolerance.</p>
+        <p>Detect the exact moment of payload state transitions.</p>
       </div>
     </div>
   </section>
@@ -205,18 +202,23 @@
     <pre>dataset_root/
   log/
     frame_size/
-      250mm/ d250_1.ulg  d250_2.ulg  d250_3.ulg
-      450mm/ ...   500mm/ ...   650mm/ ...   680mm/ ...
+      250mm/ d250_1.ulg ...
+      450mm/ d450_1.ulg ...
+      500mm/ d500_1.ulg ...
+      650mm/ d650_1.ulg ...
+      680mm/ d680_1.ulg ...
     payload/
       x500v2/
-        0.5kg/ 1_scenario_t1.ulg ... 5_scenario_t3.ulg
-        0.75kg/ ...   1kg/ ...
+        0.5kg/ 1_scenario_t1.ulg ...
+        0.75kg/ 1_scenario_t1.ulg ...
+        1kg/ 1_scenario_t1.ulg ...
       x650/
-        0.5kg/ ...   1kg/ ...   1.5kg/ ...   2kg/ ...
-  csv/        same layout, one folder of CSV files per log
-  metadata/
-    flights.csv   one row per log
-    events.csv    pickup and drop times</pre>
+        0.5kg/ 1_scenario_t1.ulg ...
+        1kg/ 1_scenario_t1.ulg ...
+        1.5kg/ 1_scenario_t1.ulg ...
+        2kg/ 1_scenario_t1.ulg ...
+  csv/
+  metadata/</pre>
   </section>
 
   <section>
@@ -225,9 +227,10 @@
     <pre>source venv/bin/activate
 pip install -r requirements.txt
 
-python run_all.py --data &lt;dataset_root&gt; --out outputs</pre>
+python run_all.py --data &lt;dataset_root&gt; --out outputs
+python scripts/task1_frame_classification.py --data &lt;dataset_root&gt; --out outputs</pre>
     <p>
-      Each task can also be run on its own from <code>scripts/</code>. See the
+      See the
       <a href="https://github.com/Azamatjon11/DroneLog">repository README</a>
       for full usage details.
     </p>
@@ -236,16 +239,16 @@ python run_all.py --data &lt;dataset_root&gt; --out outputs</pre>
   <section>
     <h2>Selected Results</h2>
     <figure>
-      <img src="outputs/task3_mass_scatter.png" alt="Task 3 mass estimation scatter">
-      <figcaption>Task 3 — Predicted versus true carried mass on held-out flights (X500&nbsp;V2 and X650).</figcaption>
+      <img src="assets/figures/task4_trajectory.png" alt="Task 4 trajectory plot">
+      <figcaption>Task 4 — IMU-only strapdown trajectory vs. PX4 EKF and GPS-derived ground truth.</figcaption>
     </figure>
     <figure>
-      <img src="outputs/task5_events.png" alt="Task 5 event detection plot">
-      <figcaption>Task 5 — Pickup and drop detection on a held-out flight, against the annotated times.</figcaption>
+      <img src="assets/figures/task5_events.png" alt="Task 5 event detection plot">
+      <figcaption>Task 5 — Detected payload pickup/drop events against annotated ground truth.</figcaption>
     </figure>
     <p>
-      Full results tables are available in the
-      <a href="https://github.com/Azamatjon11/DroneLog#results">repository README</a>.
+      Full results tables for all five tasks are available in the
+      <a href="https://github.com/Azamatjon11/DroneLog#extended-benchmark-tasks">repository README</a>.
     </p>
   </section>
 
